@@ -28,9 +28,9 @@ class ShogiManager:
         else:
             return True
 
-    def create(self, channel_id, users):
+    def create(self, channel_id, users, teai='平手'):
         if self.is_creatable(channel_id):
-            shogi = Shogi(channel_id, users)
+            shogi = Shogi(channel_id, users, teai)
             self.shogi[channel_id] = shogi
             return shogi
         else:
@@ -54,9 +54,9 @@ class ShogiInput:
     manager = ShogiManager()
 
     @staticmethod
-    def init(channel_id, users):
+    def init(channel_id, users, teai='平手'):
         if ShogiInput.creatable_new_shogi(channel_id, users):
-            shogi = ShogiInput.manager.create(channel_id, users)
+            shogi = ShogiInput.manager.create(channel_id, users, teai)
             return shogi
         else:
             return None
@@ -154,8 +154,8 @@ class ShogiUser:
 
 class Shogi:
 
-    def __init__(self, channel_id, users, validator=BasicUserValidator()):
-        self._shogi = ShogiModule()
+    def __init__(self, channel_id, users, teai='平手', validator=BasicUserValidator()):
+        self._shogi = ShogiModule(teai)
         self.channel_id = channel_id
         self.user_ids = [x["id"] for x in users]
         random.shuffle(users)

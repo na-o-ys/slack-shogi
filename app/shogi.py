@@ -9,10 +9,23 @@ from app.modules.shogi_output import ShogiOutput
 from app.slack_utils.user import User
 from app.helper import channel_info, should_exist_shogi
 
+teai_names = [
+    "平手",
+    "香落ち",
+    "角落ち",
+    "飛車落ち",
+    "飛香落ち",
+    "二枚落ち",
+    "四枚落ち",
+    "六枚落ち",
+]
 
-@respond_to('start with <?@?([\d\w_-]+)>?')
+teai_names_string_regex = "|".join(teai_names)
+
+@respond_to('start with <?@?([\d\w_-]+)>?$')
+@respond_to('start with <?@?([\d\w_-]+)>? (' + teai_names_string_regex + ')?')
 @channel_info
-def start_shogi(channel, message, opponent_name):
+def start_shogi(channel, message, opponent_name, teai='平手'):
     slacker = message._client.webapi
     user = User(slacker)
 
@@ -32,7 +45,7 @@ def start_shogi(channel, message, opponent_name):
     }, {
         "id": opponent_id,
         "name": user.id_to_username(opponent_id),
-    }])
+    }], teai=teai)
 
     if shogi is None:
         message.reply("Shogi started already by a user. Sorry.\nIf you want to quit shogi which already exists, please say this command `resign`")
@@ -59,7 +72,7 @@ koma_names = [
 
 koma_names_string_regex = "|".join(koma_names)
 
-@respond_to("([一二三四五六七八九123456789１２３４５６７８９]{2})?(同)?(" + koma_names_string_regex + ")([上右下左寄直打]{1,2})?つ?(成)?")
+@respond_to("^([一二三四五六七八九123456789１２３４５６７８９]{2})?(同)?(" + koma_names_string_regex + ")([上右下左寄直打]{1,2})?つ?(成)?")
 @channel_info
 @should_exist_shogi
 def koma_move(channel, message, position, dou, koma, sub_position=None, promote=None):
