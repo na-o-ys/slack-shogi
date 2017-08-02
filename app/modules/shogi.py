@@ -1,3 +1,4 @@
+import copy
 from app.modules.koma import Koma
 from app.modules.teai import TEAI
 
@@ -9,7 +10,7 @@ class Shogi:
         self.second_tegoma = []
         self.last_move_x = None
         self.last_move_y = None
-        self.board = TEAI[teai]
+        self.board = copy.deepcopy(TEAI[teai])
 
     def move(self, from_x, from_y, to_x, to_y, promote):
         koma = self.board[from_y][from_x]
