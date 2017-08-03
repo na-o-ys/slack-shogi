@@ -121,7 +121,7 @@ class ShogiTest(unittest.TestCase):
         self.assertEqual(shogi.board[5][2], Koma.empty)
         ShogiInput.move("76歩", channel_id, shogi.first_user.id)
         self.assertEqual(shogi.board[5][2], Koma.fu)
- 
+
     def test_matta_for_UserDifferentException(self):
         channel_id = "test_matta_for_UserDifferentException"
         shogi = ShogiInput.init(channel_id, [{
@@ -185,3 +185,53 @@ class ShogiTest(unittest.TestCase):
         }])
         ShogiInput.get_shogi_board(channel_id)
 
+    def test_komaochi(self):
+        channel_id = "test_komaochi"
+        shogi = ShogiInput.init(channel_id, [{
+            "id": "user1",
+            "name": "user1name",
+        }, {
+            "id": "user2",
+            "name": "user2name",
+        }], "二枚落ち")
+
+        self.assertEqual(shogi.board[7][1], Koma.empty)
+        self.assertEqual(shogi.board[7][7], Koma.empty)
+
+    def test_komaochi_move(self):
+        channel_id = "test_komaochi_move"
+        shogi = ShogiInput.init(channel_id, [{
+            "id": "user1",
+            "name": "user1name",
+        }, {
+            "id": "user2",
+            "name": "user2name",
+        }], "角落ち")
+
+        ShogiInput.move("76歩", channel_id, shogi.first_user.id)
+        ShogiInput.move("34歩", channel_id, shogi.second_user.id)
+        ShogiInput.move("26歩", channel_id, shogi.first_user.id)
+        ShogiInput.move("88角成", channel_id, shogi.second_user.id)
+
+        self.assertEqual(len(shogi.second_tegoma), 0)
+
+    def test_komaochi_matta(self):
+        channel_id = "test_komaochi_matta"
+        shogi = ShogiInput.init(channel_id, [{
+            "id": "user1",
+            "name": "user1name",
+        }, {
+            "id": "user2",
+            "name": "user2name",
+        }], "角落ち")
+
+        ShogiInput.move("76歩", channel_id, shogi.first_user.id)
+        ShogiInput.move("34歩", channel_id, shogi.second_user.id)
+        ShogiInput.move("26歩", channel_id, shogi.first_user.id)
+        ShogiInput.move("88角成", channel_id, shogi.second_user.id)
+        ShogiInput.move("同銀", channel_id, shogi.first_user.id)
+        ShogiInput.matta(channel_id, shogi.second_user.id)
+
+        self.assertEqual(len(shogi.second_tegoma), 0)
+        self.assertEqual(shogi.board[7][1], Koma.opponent_promoted_kaku)
+        self.assertEqual(shogi.board[8][2], Koma.gin)

@@ -155,6 +155,7 @@ class ShogiUser:
 class Shogi:
 
     def __init__(self, channel_id, users, teai='平手', validator=BasicUserValidator()):
+        self.teai = teai
         self._shogi = ShogiModule(teai)
         self.channel_id = channel_id
         self.user_ids = [x["id"] for x in users]
@@ -192,7 +193,7 @@ class Shogi:
         if len(self.kifu.kifu) == 0:
             raise KomaCannotMoveException
         self.kifu.pop()
-        self._shogi = ShogiModule()
+        self._shogi = ShogiModule(self.teai)
         for kifu in self.kifu.kifu:
             from_x, from_y, to_x, to_y, promote, koma = kifu
             if koma is None:
